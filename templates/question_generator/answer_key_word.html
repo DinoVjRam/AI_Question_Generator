@@ -1,0 +1,161 @@
+<html>
+
+<body>
+
+
+<h1 style="text-align:center;">
+ANSWER KEY
+</h1>
+
+
+<h3>
+Subject :
+{{ paper.study_material.subject }}
+</h3>
+
+
+<p>
+Course Code :
+{{ paper.study_material.course_code }}
+</p>
+
+
+<hr>
+
+
+
+{% if section_a %}
+
+<h2>
+SECTION A
+</h2>
+
+
+{% for q in section_a %}
+
+<p>
+
+<b>
+Q{{ forloop.counter }}
+</b>
+
+
+<br><br>
+
+
+<b>
+Answer:
+</b>
+
+
+<br>
+
+
+{{ q.answer }}
+
+
+</p>
+
+
+<hr>
+
+
+{% endfor %}
+
+{% endif %}
+
+
+
+
+
+{% if section_b %}
+
+<h2>
+SECTION B
+</h2>
+
+
+{% for q in section_b %}
+
+<p>
+
+<b>
+Q{{ forloop.counter }}
+</b>
+
+
+<br><br>
+
+
+<b>
+Answer:
+</b>
+
+
+<br>
+
+
+{{ q.answer }}
+
+
+</p>
+
+
+<hr>
+
+
+{% endfor %}
+
+{% endif %}
+
+
+
+
+
+
+
+{% if section_c %}
+
+<h2>
+SECTION C
+</h2>
+
+
+{% for q in section_c %}
+
+<p>
+
+<b>
+Q{{ forloop.counter }}
+</b>
+
+
+<br><br>
+
+
+<b>
+Answer:
+</b>
+
+
+<br>
+
+
+{{ q.answer }}
+
+
+</p>
+
+
+<hr>
+
+
+{% endfor %}
+
+{% endif %}
+
+
+
+</body>
+
+</html>

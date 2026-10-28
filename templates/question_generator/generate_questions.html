@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 mb-5 px-0">
+
+    <div class="card shadow">
+
+        <div class="card-header app-header text-white">
+            <h3 class="mb-0">🤖 AI Question Generator</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form
+                method="POST"
+                action="{% url 'generate_questions' material.id %}"
+                id="questionGenerationForm">
+
+                {% csrf_token %}
+
+                <!-- ========================= -->
+                <!-- COURSE INFORMATION -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>📘 Course Information</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <table class="table table-bordered mb-0">
+
+                            <tr>
+                                <th width="220">Course Code</th>
+                                <td>{{ material.course_code }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Course Name</th>
+                                <td>{{ material.title }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Subject</th>
+                                <td>{{ material.subject }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Semester</th>
+                                <td>{{ material.semester }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Academic Year</th>
+                                <td>{{ material.academic_year }}</td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- UNIT SELECTION -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>📚 Select Units</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        {% for unit in material.units_json.units %}
+
+                        <div class="form-check mb-2">
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                name="units"
+                                value="{{ unit.unit_no }}">
+
+                            <label class="form-check-label">
+
+                                <strong>
+                                    Unit {{ unit.unit_no }}
+                                </strong>
+
+                                -
+
+                                {{ unit.title }}
+
+                            </label>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- AI SETTINGS -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>⚙ AI Settings</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Difficulty
+                                </label>
+
+                                {{ form.difficulty }}
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Bloom Level
+                                </label>
+
+                                {{ form.bloom }}
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Question Type
+                                </label>
+
+                                {{ form.question_type }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- QUESTION PATTERN -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header d-flex justify-content-between">
+
+                        <h5>Question Pattern</h5>
+
+                        <table class="table table-bordered align-middle" id="patternTable">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th width="120">Section</th>
+                                    <th width="180">Unit Selection</th>
+                                    <th width="150">Marks</th>
+                                    <th width="180">Questions</th>
+                                    <th width="120">Action</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+
+                                    <!-- Section -->
+
+                                    <td>
+
+                                        <select
+                                            name="sections[]"
+                                            class="form-select">
+
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+
+                                        </select>
+
+                                    </td>
+
+                                    <!-- Unit -->
+
+                                    <td>
+
+                                        <select
+                                            name="pattern_units[]"
+                                            class="form-select">
+
+                                            {% for unit in material.units_json.units %}
+
+                                            <option value="{{ unit.unit_no }}">
+                                                Unit {{ unit.unit_no }}
+                                            </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </td>
+
+                                    <!-- Marks -->
+
+                                    <td>
+
+                                        <input
+                                            type="number"
+                                            name="marks[]"
+                                            class="form-control"
+                                            value="2"
+                                            min="1"
+                                            onchange="calculateTotals()">
+
+                                    </td>
+
+                                    <!-- Count -->
+
+                                    <td>
+
+                                        <input
+                                            type="number"
+                                            name="counts[]"
+                                            class="form-control"
+                                            value="1"
+                                            min="1"
+                                            onchange="calculateTotals()">
+
+                                    </td>
+
+                                    <!-- Remove -->
+
+                                    <td>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="removeRow(this)">
+
+                                            Remove
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary"
+                            onclick="addRow()">
+
+                            + Add Pattern
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- ========================= -->
+                <!-- SUMMARY -->
+                <!-- ========================= -->
+
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>📊 Paper Summary</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+
+                                <div class="alert alert-info text-center">
+
+                                    <h5>Total Questions</h5>
+
+                                    <h3 id="totalQuestions">
+                                        10
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <div class="alert alert-success text-center">
+
+                                    <h5>Total Marks</h5>
+
+                                    <h3 id="totalMarks">
+                                        10
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="text-center">
+
+                    <button
+                        type="submit"
+                        id="generateButton"
+                        class="btn btn-success btn-lg px-5">
+
+                        Generate Question Paper
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div id="processingOverlay">
+
+                <div class="processing-box">
+
+                    <div class="spinner-border text-primary mb-3"
+                        role="status">
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Generating Question Paper...
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        AI is analyzing the selected units
+                        and generating questions and answers.
+                    </p>
+
+                    <p class="text-muted small mt-2">
+                        Please wait. Do not close or refresh this page.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const unitOptions = `
+{% for unit in material.units_json.units %}
+<option value="{{ unit.unit_no }}">
+    Unit {{ unit.unit_no }}
+</option>
+{% endfor %}
+`;
+
+function addRow() {
+
+    let tbody = document.querySelector("#patternTable tbody");
+
+    let row = `
+    <tr>
+
+        <td>
+            <select name="sections[]" class="form-select">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+        </td>
+
+        <td>
+            <select name="pattern_units[]" class="form-select">
+                ${unitOptions}
+            </select>
+        </td>
+
+        <td>
+            <input
+                type="number"
+                name="marks[]"
+                class="form-control"
+                value="2"
+                min="1"
+                onchange="calculateTotals()">
+        </td>
+
+        <td>
+            <input
+                type="number"
+                name="counts[]"
+                class="form-control"
+                value="1"
+                min="1"
+                onchange="calculateTotals()">
+        </td>
+
+        <td>
+            <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                onclick="removeRow(this)">
+                Remove
+            </button>
+        </td>
+
+    </tr>
+    `;
+
+    tbody.insertAdjacentHTML("beforeend", row);
+
+    calculateTotals();
+}
+
+function removeRow(button){
+
+    let rows = document.querySelectorAll("#patternTable tbody tr");
+
+    if(rows.length===1){
+
+        alert("At least one question pattern is required.");
+
+        return;
+
+    }
+
+    button.closest("tr").remove();
+
+    calculateTotals();
+
+}
+
+function calculateTotals(){
+
+    let totalQuestions = 0;
+
+    let totalMarks = 0;
+
+    document.querySelectorAll("#patternTable tbody tr").forEach(function(row){
+
+        let marks = parseInt(
+            row.querySelector('input[name="marks[]"]').value
+        ) || 0;
+
+        let count = parseInt(
+            row.querySelector('input[name="counts[]"]').value
+        ) || 0;
+
+        totalQuestions += count;
+
+        totalMarks += marks * count;
+
+    });
+
+    document.getElementById("totalQuestions").innerText = totalQuestions;
+
+    document.getElementById("totalMarks").innerText = totalMarks;
+
+}
+
+calculateTotals();
+
+document
+    .getElementById("questionGenerationForm")
+    .addEventListener("submit", function(event) {
+
+        const selectedUnits =
+            document.querySelectorAll(
+                'input[name="units"]:checked'
+            );
+
+        // Check unit selection
+        if (selectedUnits.length === 0) {
+
+            event.preventDefault();
+
+            alert("Please select at least one unit.");
+
+            return;
+        }
+
+
+        // Show loading screen
+        document.getElementById(
+            "processingOverlay"
+        ).style.display = "flex";
+
+
+        // Disable button
+        const button =
+            document.getElementById(
+                "generateButton"
+            );
+
+        button.disabled = true;
+
+        button.innerHTML =
+            "⏳ Generating...";
+
+    });
+
+</script>
+
+{% endblock %}

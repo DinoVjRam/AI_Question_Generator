@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="w-100">
+
+    <!-- PAGE TITLE -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            🤖 AI Question Generator
+        </h2>
+
+        <p class="text-muted">
+            Select an analyzed syllabus to generate AI-powered questions.
+        </p>
+
+    </div>
+
+
+    <!-- GENERATED QUESTIONS SECTION -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                📚 Generated Questions
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Course Code</th>
+
+                            <th>Course Name</th>
+
+                            <th>Subject</th>
+
+                            <th>Semester</th>
+
+                            <th>Academic Year</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for m in materials %}
+
+                        <tr
+                            data-material-id="{{ m.id }}"
+                            data-status="{{ m.status }}">
+
+                            <td>
+                                {{ m.course_code }}
+                            </td>
+
+                            <td>
+                                {{ m.title }}
+                            </td>
+
+                            <td>
+                                {{ m.subject }}
+                            </td>
+
+                            <td>
+                                {{ m.semester }}
+                            </td>
+
+                            <td>
+                                {{ m.academic_year }}
+                            </td>                       
+
+                            <!-- ACTION -->
+
+                            <td
+                                id="action-{{ m.id }}"
+                                data-papers-url="{% url 'question_paper_list' m.id %}">
+
+                                {% if m.status == "UNITS_EXTRACTED" or m.status == "QUESTIONS_GENERATED" %}
+
+                                    <a
+                                        href="{% url 'question_paper_list' m.id %}"
+                                        class="btn btn-dark btn-sm">
+
+                                        📄 Papers
+
+                                    </a>
+
+                                {% elif m.status == "FAILED" %}
+
+                                    <span class="text-danger">
+                                        Generation Failed
+                                    </span>                               
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center">
+
+                                Questions not generated.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     AUTOMATIC STATUS CHECK
+===================================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * Find all material rows
+     */
+
+    const rows = document.querySelectorAll(
+        "tr[data-material-id]"
+    );
+
+
+    /*
+     * Check status for one material
+     */
+
+    function checkStatus(materialId) {
+
+        const statusUrl =
+            "{% url 'question_generation_status' 0 %}"
+            .replace("0", materialId);
+
+
+        fetch(statusUrl)
+
+            .then(function (response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Status request failed"
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function (data) {
+
+                updateStatus(
+                    materialId,
+                    data.status
+                );
+
+
+                /*
+                 * Stop polling when completed
+                 */
+
+                if (
+                    data.status === "QUESTIONS_GENERATED" ||
+                    data.status === "FAILED"
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * Check again after 3 seconds
+                 */
+
+                setTimeout(function () {
+
+                    checkStatus(materialId);
+
+                }, 3000);
+
+            })
+
+            .catch(function (error) {
+
+                console.error(
+                    "Status check error:",
+                    error
+                );
+
+
+                /*
+                 * Retry after 5 seconds
+                 */
+
+                setTimeout(function () {
+
+                    checkStatus(materialId);
+
+                }, 5000);
+
+            });
+
+    }
+
+
+    /*
+     * Update status and action button
+     */
+
+    function updateStatus(materialId, status) {
+
+        const statusElement =
+            document.getElementById(
+                "status-" + materialId
+            );
+
+
+        const actionElement =
+            document.getElementById(
+                "action-" + materialId
+            );
+
+
+        if (!statusElement || !actionElement) {
+
+            return;
+
+        }
+
+
+        /*
+         * QUESTIONS GENERATED
+         */
+
+        if (status === "QUESTIONS_GENERATED") {
+
+            statusElement.innerHTML = `
+                <span class="badge bg-success">
+                    ✅ Questions Generated
+                </span>
+            `;
+
+
+            const papersUrl =
+                actionElement.dataset.papersUrl;
+
+
+            actionElement.innerHTML = `
+                <a
+                    href="${papersUrl}"
+                    class="btn btn-dark btn-sm">
+
+                    📄 Papers
+
+                </a>
+            `;
+
+
+            return;
+
+        }
+
+
+        /*
+         * FAILED
+         */
+
+        if (status === "FAILED") {
+
+            statusElement.innerHTML = `
+                <span class="badge bg-danger">
+                    ❌ Failed
+                </span>
+            `;
+
+
+            actionElement.innerHTML = `
+                <span class="text-danger">
+                    Generation Failed
+                </span>
+            `;
+
+
+            return;
+
+        }
+
+
+        /*
+         * PROCESSING
+         */
+
+        statusElement.innerHTML = `
+            <span class="badge bg-warning text-dark">
+                ⏳ Processing
+            </span>
+        `;
+        if (status === "UNITS_EXTRACTED") {
+
+            statusElement.innerHTML = `
+                <span class="badge bg-info text-dark">
+                    ⏳ Ready for Generation
+                </span>
+            `;
+
+            return;
+        }
+
+        if (status === "GENERATING_QUESTIONS") {
+
+            statusElement.innerHTML = `
+                <span class="badge bg-warning text-dark">
+                    ⏳ Generating Questions
+                </span>
+            `;
+
+            return;
+        }
+
+    }
+
+
+    /*
+     * Start polling
+     */
+
+    rows.forEach(function (row) {
+
+        const materialId =
+            row.dataset.materialId;
+
+        const currentStatus =
+            row.dataset.status;
+
+
+        /*
+         * Only poll unfinished materials
+         */
+
+        if (
+            currentStatus !== "QUESTIONS_GENERATED" &&
+            currentStatus !== "FAILED"
+        ) {
+
+            checkStatus(materialId);
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

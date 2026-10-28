@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- =====================================================
+         DASHBOARD HEADER
+    ====================================================== -->
+
+    <div class="dashboard-header mb-4">
+
+        <h2 class="fw-bold">
+            📊 Dashboard
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Welcome,
+
+            {% if user.first_name %}
+                {{ user.first_name }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+
+            ! Manage your syllabus and generate
+            AI-powered question papers.
+
+        </p>
+
+    </div>
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- SYLLABUS MATERIALS -->
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <h6 class="text-muted mb-2">
+                                Syllabus Materials
+                            </h6>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_materials }}
+                            </h2>
+
+                        </div>
+
+                        <div class="dashboard-icon">
+                            📚
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- GENERATED PAPERS -->
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <h6 class="text-muted mb-2">
+                                Generated Papers
+                            </h6>
+
+                            <h2 class="fw-bold mb-0">
+
+                                {{ total_papers}}
+
+                            </h2>
+
+                        </div>
+
+                        <div class="dashboard-icon">
+                            📄
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- GENERATED QUESTIONS -->
+
+        <div class="col-md-4">
+
+            <div class="card dashboard-card shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <h6 class="text-muted mb-2">
+                                Generated Questions
+                            </h6>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ total_questions }}
+                            </h2>
+
+                        </div>
+
+                        <div class="dashboard-icon">
+                            ❓
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         QUICK ACTIONS
+    ====================================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                ⚡ Quick Actions
+            </h5>
+
+            <div class="d-flex flex-wrap gap-3">
+
+
+                <a
+                    href="{% url 'material_upload' %}"
+                    class="btn btn-primary">
+
+                    📤 Upload Syllabus
+
+                </a>
+
+
+                <a
+                    href="{% url 'material_list' %}"
+                    class="btn btn-dark">
+
+                    📚 View Syllabus
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROCEDURE
+    ====================================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+
+        <div class="card-header">
+
+            <h5 class="fw-bold mb-0">
+                📖 How to Generate a Question Paper
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+
+                <!-- STEP 1 -->
+
+                <div class="col-md-3">
+
+                    <div class="procedure-step">
+
+                        <div class="step-number">
+                            1
+                        </div>
+
+                        <h6 class="fw-bold">
+                            Upload Syllabus
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            Upload your syllabus document
+                            and enter the required course
+                            details.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 2 -->
+
+                <div class="col-md-3">
+
+                    <div class="procedure-step">
+
+                        <div class="step-number">
+                            2
+                        </div>
+
+                        <h6 class="fw-bold">
+                            Generate Questions
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            Select the required units,
+                            difficulty and Bloom Level,
+                            then click Generate Questions.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 3 -->
+
+                <div class="col-md-3">
+
+                    <div class="procedure-step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <h6 class="fw-bold">
+                            Preview
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            Preview the generated
+                            question paper and answer key.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STEP 4 -->
+
+                <div class="col-md-3">
+
+                    <div class="procedure-step">
+
+                        <div class="step-number">
+                            4
+                        </div>
+
+                        <h6 class="fw-bold">
+                            Download
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+
+                            Download the question paper
+                            and answer key as Word or PDF.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+        WORKFLOW
+    ====================================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                🔄 Question Paper Workflow
+            </h5>
+
+            <div class="workflow">
+
+                <span class="workflow-item">
+                    📤 Upload Syllabus
+                </span>
+
+                <span class="workflow-arrow">
+                    →
+                </span>
+
+                <span class="workflow-item">
+                    🔍 Analyze
+                </span>
+
+                <span class="workflow-arrow">
+                    →
+                </span>
+
+                <span class="workflow-item">
+                    🤖 Generate Questions
+                </span>
+
+                <span class="workflow-arrow">
+                    →
+                </span>
+
+                <span class="workflow-item">
+                    👁️ Preview
+                </span>
+
+                <span class="workflow-arrow">
+                    →
+                </span>
+
+                <span class="workflow-item">
+                    📥 Download
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT GENERATED PAPERS
+    ====================================================== -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="fw-bold mb-0">
+                📄 Recent Generated Papers
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Course Code</th>
+
+                            <th>Course Name</th>
+
+                            <th>Subject</th>
+
+                            <th>Difficulty</th>
+
+                            <th>Questions</th>
+
+                            <th>Date</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for paper in recent_papers %}
+
+                        <tr>
+
+                            <td>
+                                {{ paper.study_material.course_code }}
+                            </td>
+
+                            <td>
+                                {{ paper.study_material.title }}
+                            </td>
+
+                            <td>
+                                {{ paper.study_material.subject }}
+                            </td>
+
+                            <td>
+                                {{ paper.difficulty }}
+                            </td>
+
+                            <td>
+                                {{ paper.total_questions }}
+                            </td>
+
+                            <td>
+                                {{ paper.created_at|date:"d M Y" }}
+                            </td>
+
+                            <td>
+
+                                <a
+                                    href="{% url 'question_paper_detail' paper.id %}"
+                                    class="btn btn-primary btn-sm">
+
+                                    👁️ View
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center text-muted py-4">
+
+                                No question papers generated yet.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

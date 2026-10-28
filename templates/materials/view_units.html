@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 px-0">
+
+    <h2>📑 Extracted Units</h2>
+
+    {% if units %}
+
+        <div class="card p-3">
+
+            {% for u in units.units %}
+
+                <div class="border p-3 mb-2">
+
+                    <h5>Unit {{ u.unit_no }}: {{ u.title }}</h5>
+
+                    <ul>
+                        {% for t in u.topics %}
+                            <li>{{ t }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p>No units found.</p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

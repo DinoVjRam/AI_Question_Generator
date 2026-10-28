@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 px-0">
+
+    <div class="card shadow">
+
+        <div class="card-header app-header text-white">
+
+            <h3 class="mb-0">
+                📘 Upload Syllabus
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            <!-- =====================================================
+                 AI PROCESSING INFORMATION
+            ====================================================== -->
+
+            <div class="alert alert-info">
+
+                <h5>
+                    AI Processing
+                </h5>
+
+                <p class="mb-2">
+
+                    After uploading the syllabus,
+                    the AI will automatically:
+
+                </p>
+
+                <ul class="mb-0">
+
+                    <li>
+                        Extract syllabus text
+                    </li>
+
+                    <li>
+                        Identify Units
+                    </li>
+
+                    <li>
+                        Identify Topics
+                    </li>
+
+                    <li>
+                        Prepare the syllabus for
+                        AI Question Generation
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- =====================================================
+                 UPLOAD FORM
+            ====================================================== -->
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="syllabusUploadForm">
+
+                {% csrf_token %}
+
+
+                <div class="row">
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Course Code
+                        </label>
+
+                        {{ form.course_code }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Course Name
+                        </label>
+
+                        {{ form.title }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Subject
+                        </label>
+
+                        {{ form.subject }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Department
+                        </label>
+
+                        {{ form.department }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Semester
+                        </label>
+
+                        {{ form.semester }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Academic Year
+                        </label>
+
+                        {{ form.academic_year }}
+
+                    </div>
+
+
+                    <div class="col-md-12 mb-3">
+
+                        <label class="form-label">
+                            Upload Syllabus
+                        </label>
+
+                        {{ form.uploaded_file }}
+
+                    </div>
+
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- =================================================
+                     BUTTONS
+                ================================================== -->
+
+                <button
+                    type="submit"
+                    id="uploadButton"
+                    class="btn btn-success btn-lg">
+
+                    📤 Upload & Process
+
+                </button>
+
+
+                <a
+                    href="{% url 'material_list' %}"
+                    class="btn btn-secondary btn-lg">
+
+                    Cancel
+
+                </a>
+
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     AI PROCESSING OVERLAY
+============================================================== -->
+
+<div id="syllabusProcessingOverlay">
+
+    <div class="processing-box">
+
+
+        <div
+            class="spinner-border text-primary mb-3"
+            role="status">
+
+        </div>
+
+
+        <h5 class="fw-bold">
+
+            Processing Syllabus...
+
+        </h5>
+
+
+        <p class="text-muted mb-0">
+
+            AI is extracting the syllabus text
+            and identifying units and topics.
+
+        </p>
+
+
+        <p class="text-muted small mt-2">
+
+            Please wait.
+            Do not close or refresh this page.
+
+        </p>
+
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     JAVASCRIPT
+============================================================== -->
+
+<script>
+
+document
+    .getElementById("syllabusUploadForm")
+    .addEventListener("submit", function(event) {
+
+
+        /*
+         * Get uploaded file
+         */
+
+        const fileInput =
+            document.querySelector(
+                'input[type="file"]'
+            );
+
+
+        /*
+         * Make sure a file is selected
+         */
+
+        if (
+            !fileInput ||
+            fileInput.files.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Show processing overlay
+         */
+
+        document.getElementById(
+            "syllabusProcessingOverlay"
+        ).style.display = "flex";
+
+
+        /*
+         * Disable upload button
+         */
+
+        const button =
+            document.getElementById(
+                "uploadButton"
+            );
+
+
+        button.disabled = true;
+
+
+        button.innerHTML =
+            "⏳ Processing...";
+
+
+    });
+
+</script>
+
+{% endblock %}

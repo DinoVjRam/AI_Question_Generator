@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 px-0">
+
+    <h2>📄 Generated Question Papers</h2>
+
+    <p class="text-muted">
+        Course: <strong>{{ material.course_code }} - {{ material.title }}</strong>
+    </p>
+
+    <a href="{% url 'material_list' %}" class="btn btn-secondary btn-sm mb-3">
+        ← Back
+    </a>
+
+    {% if papers %}
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Difficulty</th>
+                <th>Bloom Level</th>
+                <th>Questions</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for p in papers %}
+
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.difficulty }}</td>
+                <td>{{ p.bloom_level }}</td>
+                <td>{{ p.total_questions }}</td>
+                <td>{{ p.created_at }}</td>
+                <td>
+                    <a href="{% url 'question_paper_detail' p.id %}"
+                       class="btn btn-primary btn-sm">
+                        View Paper
+                    </a>
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No question papers generated yet.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
